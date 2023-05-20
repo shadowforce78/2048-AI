@@ -2,7 +2,6 @@ import pygame
 import random
 import tensorflow as tf
 import numpy as np
-import agent
 
 # Définition des constantes
 WINDOW_SIZE = 400
@@ -169,66 +168,5 @@ def play_game():
                         draw_grid(grid)
 
 
-# Création du modèle
-def get_empty_cells(grid):
-    empty_cells = []
-    for row in range(GRID_SIZE):
-        for col in range(GRID_SIZE):
-            if grid[row][col] == 0:
-                empty_cells.append((row, col))
-    return empty_cells
-
-
-# Fonction pour obtenir le meilleur mouvement
-def get_best_move(grid, model):
-    scores = []
-    for move in [pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN]:
-        prev_grid = [row[:] for row in grid]
-        update_grid(grid, move)
-        if not np.array_equal(grid, prev_grid):
-            X = np.array([grid])
-            y = model.predict(X)
-            scores.append((move, y[0][0]))
-        grid = prev_grid
-    if scores:
-        scores.sort(key=lambda x: x[1], reverse=True)
-        best_moves = [move for move, score in scores if score == scores[0][1]]
-        best_move = random.choice(best_moves)
-        return best_move
-    return None
-
-
-
-
-
-
-def agent_play_game(model):
-    grid = init_grid()
-    add_new_tile(grid)
-    draw_grid(grid)
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                return
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_q:
-                    pygame.quit()
-                    return
-        best_move = get_best_move(grid, model)
-        if best_move:
-            prev_grid = [row[:] for row in grid]
-            update_grid(grid, best_move)
-            agent.update_data(prev_grid, best_move)
-            if grid != prev_grid:
-                add_new_tile(grid)
-            draw_grid(grid)
-            if is_game_over(grid):
-                grid = init_grid()
-                add_new_tile(grid)
-            draw_grid(grid)
-
-
-# Appel de la fonction principale pour commencer le jeu
-model = agent.get_model()
-agent_play_game(model)
+# Fonction principale pour jouer au jeu
+play_game()
